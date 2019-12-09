@@ -24,7 +24,7 @@ class TagCrudController extends CrudController
         $this->crud->setModel('App\Models\Tag');
         $this->crud->setRoute(config('backpack.base.route_prefix') . '/tag');
         $this->crud->setEntityNameStrings('tag', 'tags');
-        $this->crud->setCreateView('vendor.backpack.base.demo');
+        $this->crud->setCreateView('admin.addArticle');
     }
 
     protected function setupListOperation()
@@ -35,39 +35,31 @@ class TagCrudController extends CrudController
 
     protected function setupCreateOperation()
     {
-        $this->crud->setValidation(TagRequest::class);
-
-        // TODO: remove setFromDb() and manually define Fields
-        // $this->crud->setFromDb();
-         $this->data['title'] = trans('backpack::base.dashboard'); // set the page title
-         $this->data['widgets']['before_content'] = [
-            [
-                'type' => 'card',
-                'wrapperClass' => 'col-12',
-                'content' => [
-                    'header' => 'Some card title',
-                    'body' => '
-                    <form method="POST" action="/admin/article/create">
-                    <div class="form-group">
-                    <lable for="name">Title:</lable>
-                    <input class="form-control" name="name" id="name" type="text" placeholder="demo input">
-                    </div>
-                    <div class="form-group">
-                    <lable for="name">Slug:</lable>
-                    <input class="form-control" name="name" id="name" type="text" placeholder="demo input">
-                    </div>
-                    <button class="btn btn-info" type="submit">Save</button>
-                    </form>
-                    ',
-                ]
-            ],
-        ];
-
-        return view(backpack_view('demo'), $this->data);
+        // $this->crud->setValidation(TagRequest::class);
     }
 
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+    }
+
+    public function store(TagRequest $request)
+    {
+        $this->crud->hasAccessOrFail('create');
+
+        // execute the FormRequest authorization and validation, if one is required
+        $request = $this->crud->validateRequest();
+
+        // insert item in the db
+        $item = $this->crud->create(['name'=>$request->name]);
+        $this->data['entry'] = $this->crud->entry = $item;
+
+        // show a success message
+        \Alert::success(trans('backpack::crud.insert_success'))->flash();
+
+        // save the redirect choice for next time
+        $this->crud->setSaveAction();
+
+        return $this->crud->performSaveAction($item->getKey());
     }
 }

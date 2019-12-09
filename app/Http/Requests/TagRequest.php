@@ -26,7 +26,7 @@ class TagRequest extends FormRequest
     public function rules()
     {
         return [
-            // 'name' => 'required|min:5|max:255'
+            'name' => 'required|min:5|max:255',
         ];
     }
 
@@ -38,7 +38,7 @@ class TagRequest extends FormRequest
     public function attributes()
     {
         return [
-            //
+            'name' => 'tên thẻ',
         ];
     }
 
@@ -50,7 +50,7 @@ class TagRequest extends FormRequest
     public function messages()
     {
         return [
-            //
+            // 'required' => ":attribute là bắt buộc",
         ];
     }
 }
